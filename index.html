@@ -1,1 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baixar Aura player TV • Download Oficial (.APK)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #060611;
+            color: #F3F4F6;
+        }
+        .aura-bg {
+            background:
+                radial-gradient(circle at 85% 10%, rgba(41, 121, 255, 0.22), transparent 40%),
+                radial-gradient(circle at 15% 85%, rgba(156, 39, 176, 0.20), transparent 45%),
+                linear-gradient(180deg, #070714 0%, #0B0A1F 55%, #05050D 100%);
+        }
+        .glass-card {
+            background: rgba(16, 15, 34, 0.82);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        .aura-gradient-text {
+            background: linear-gradient(90deg, #D500F9 0%, #2979FF 52%, #00E5FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .aura-btn {
+            background: linear-gradient(90deg, #9C27B0 0%, #2979FF 50%, #00E5FF 100%);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.24), 0 0 20px rgba(156, 39, 176, 0.28);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+        }
+        .aura-btn:hover,
+        .aura-btn:focus {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 14px 36px rgba(0, 229, 255, 0.38), 0 0 0 3px rgba(255, 255, 255, 0.85);
+            filter: brightness(1.08);
+            outline: none;
+        }
+        .aura-btn:active {
+            transform: scale(0.98);
+        }
+        .tv-focusable:focus {
+            outline: 3px solid #00E5FF;
+            outline-offset: 2px;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.04); }
+        }
+        .glow-ring {
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="aura-bg min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:py-12">
 
+    <!-- Toast de Feedback (sem alert/confirm) -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full opacity-0 transition-all duration-300 px-4 py-3 rounded-2xl border border-white/15 shadow-2xl text-sm font-bold flex items-center gap-2.5 bg-emerald-600 text-white">
+        <span id="toast-icon">✅</span>
+        <span id="toast-msg">Download iniciado!</span>
+    </div>
+
+    <main class="w-full max-w-2xl space-y-6">
+
+        <!-- ================================================================ -->
+        <!-- CARD PRINCIPAL DE DOWNLOAD (OTIMIZADO PARA TV, CELULAR E PC)     -->
+        <!-- ================================================================ -->
+        <section class="glass-card border border-purple-500/30 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+            <!-- Detalhe de brilho superior -->
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#D500F9] via-[#2979FF] to-[#00E5FF]"></div>
+
+            <!-- Cabeçalho com Logo -->
+            <div class="flex flex-col items-center text-center space-y-4">
+                <div class="relative">
+                    <div class="glow-ring absolute -inset-2 rounded-3xl bg-gradient-to-tr from-purple-600/40 via-blue-500/30 to-cyan-400/40 blur-lg"></div>
+                    <div class="relative w-24 h-24 rounded-3xl bg-[#110F24] border border-cyan-400/35 flex items-center justify-center shadow-2xl overflow-hidden p-3">
+                        <!-- Logo personalizada do Firebase (se configurada no Painel) -->
+                        <img id="appLogoImg" src="" alt="Logo Aura player" class="w-full h-full object-contain hidden">
+                        <!-- Logo vetorial padrão Aura player -->
+                        <svg id="defaultLogoSvg" class="w-16 h-16" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="auraGrad" x1="0%" y1="100%" x2="100%" y2="15%">
+                                    <stop offset="0%" stop-color="#D500F9" />
+                                    <stop offset="38%" stop-color="#651FFF" />
+                                    <stop offset="72%" stop-color="#2979FF" />
+                                    <stop offset="100%" stop-color="#00E5FF" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M16 84 L44 16 Q50 4 56 16 L84 84" stroke="url(#auraGrad)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            <polygon points="43,42 66,56 43,70" fill="#FFFFFF" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-xs font-extrabold uppercase tracking-wider">
+                        <span id="statusDot" class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span>
+                        <span id="versionBadgeText">Verificando versão mais recente...</span>
+                    </div>
+
+                    <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-white">
+                        Aura <span class="aura-gradient-text">player</span>
+                    </h1>
+                    <p class="text-sm sm:text-base text-gray-300 max-w-md mx-auto">
+                        Baixe o aplicativo oficial para <strong>Android TV, TV Box, Mi Stick e Fire TV</strong> direto para o seu gerenciador de arquivos.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Aviso de Download Automático (quando aberto com ?auto=1) -->
+            <div id="autoDownloadBanner" class="hidden mt-6 p-3.5 rounded-2xl bg-cyan-950/60 border border-cyan-400/40 text-center text-xs sm:text-sm font-bold text-cyan-200">
+                ⏳ Iniciando o download automático em <span id="autoCountdown" class="text-white font-black">2</span>s...
+            </div>
+
+            <!-- BOTÃO GIGANTE DE DOWNLOAD DIRETO -->
+            <div class="mt-7 space-y-3">
+                <a id="btnDownloadApk"
+                   href="#"
+                   download="AuraPlayer_TV.apk"
+                   class="aura-btn w-full py-4 sm:py-5 px-6 rounded-2xl flex items-center justify-center gap-3 text-white font-black text-lg sm:text-xl tracking-wide cursor-pointer opacity-60 pointer-events-none">
+                    <svg class="w-7 h-7 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    <span id="btnDownloadLabel">Carregando link oficial...</span>
+                </a>
+
+                <!-- Informações da Versão & Botão Copiar Link -->
+                <div class="flex flex-wrap items-center justify-between gap-2 px-1 text-xs text-gray-400">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded bg-white/5 border border-white/10 font-mono text-gray-300" id="fileInfoBadge">APK • Android TV</span>
+                        <span id="updatedDateText">Sincronizado com o servidor</span>
+                    </div>
+                    <button id="btnCopyDirectLink" type="button" class="tv-focusable text-cyan-400 hover:text-cyan-300 font-bold underline cursor-pointer hidden">
+                        Copiar link direto do APK
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mensagem de Erro (caso falhe a conexão) -->
+            <div id="errorBox" class="hidden mt-5 p-4 rounded-2xl bg-red-950/60 border border-red-500/40 text-center space-y-2">
+                <p class="text-sm font-bold text-red-200" id="errorText">Não foi possível buscar o link do aplicativo agora.</p>
+                <button id="btnRetryFetch" type="button" class="tv-focusable px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-extrabold">
+                    Tentar novamente
+                </button>
+            </div>
+
+            <!-- Novidades da Versão (puxadas automaticamente do Painel Web) -->
+            <div id="releaseNotesBox" class="hidden mt-6 bg-[#0A0918]/90 border border-white/10 rounded-2xl p-4 sm:p-5 space-y-2">
+                <p class="text-xs font-extrabold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
+                    <span>✨ O que há de novo nesta versão</span>
+                </p>
+                <p id="releaseNotesText" class="text-xs sm:text-sm text-gray-300 whitespace-pre-line leading-relaxed"></p>
+            </div>
+        </section>
+
+        <!-- ================================================================ -->
+        <!-- PASSO A PASSO SIMPLES DE INSTALAÇÃO NA TV / GERENCIADOR          -->
+        <!-- ================================================================ -->
+        <section class="glass-card border border-white/10 rounded-3xl p-6 sm:p-7 space-y-4">
+            <h2 class="text-sm sm:text-base font-extrabold uppercase tracking-wider text-white flex items-center gap-2">
+                <span class="text-cyan-400">📺</span> Como instalar no seu aparelho após baixar
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm">
+                <div class="bg-[#0B0A19] border border-white/10 rounded-2xl p-4 space-y-1.5">
+                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-purple-600/30 border border-purple-400/40 text-purple-300 font-black text-xs">1</span>
+                    <p class="font-bold text-white">Baixe o arquivo</p>
+                    <p class="text-gray-400 text-xs leading-relaxed">
+                        Clique no botão azul acima. O arquivo <strong>.apk</strong> será salvo na pasta <strong>Downloads</strong> do seu aparelho.
+                    </p>
+                </div>
+
+                <div class="bg-[#0B0A19] border border-white/10 rounded-2xl p-4 space-y-1.5">
+                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-blue-600/30 border border-blue-400/40 text-blue-300 font-black text-xs">2</span>
+                    <p class="font-bold text-white">Abra nos Downloads</p>
+                    <p class="text-gray-400 text-xs leading-relaxed">
+                        Caso não abra sozinho, abra seu <strong>Gerenciador de Arquivos</strong> (ou app <em>Downloader</em>) e clique no APK baixado.
+                    </p>
+                </div>
+
+                <div class="bg-[#0B0A19] border border-white/10 rounded-2xl p-4 space-y-1.5">
+                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-cyan-500/30 border border-cyan-400/40 text-cyan-300 font-black text-xs">3</span>
+                    <p class="font-bold text-white">Permita e Instale</p>
+                    <p class="text-gray-400 text-xs leading-relaxed">
+                        Se a TV pedir, ative <strong>"Fontes Desconhecidas"</strong> para o navegador e toque em <strong>Instalar</strong>.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center text-xs text-gray-500 pb-4">
+            Aura player TV • Download direto sempre atualizado automaticamente
+        </footer>
+    </main>
+
+    <!-- ==================================================================== -->
+    <!-- SCRIPT ULTRA-COMPATÍVEL (FUNCIONA EM QUALQUER NAVEGADOR DE TV BOX)   -->
+    <!-- ==================================================================== -->
+    <script>
+        (function () {
+            // Mesmo endpoint Firestore já utilizado pelo seu App Android TV e Painel Web
+            var FIRESTORE_URL = "https://firestore.googleapis.com/v1/projects/auraplayer-update/databases/(default)/documents/config/update";
+
+            var btnDownloadApk = document.getElementById("btnDownloadApk");
+            var btnDownloadLabel = document.getElementById("btnDownloadLabel");
+            var versionBadgeText = document.getElementById("versionBadgeText");
+            var statusDot = document.getElementById("statusDot");
+            var updatedDateText = document.getElementById("updatedDateText");
+            var fileInfoBadge = document.getElementById("fileInfoBadge");
+            var releaseNotesBox = document.getElementById("releaseNotesBox");
+            var releaseNotesText = document.getElementById("releaseNotesText");
+            var errorBox = document.getElementById("errorBox");
+            var errorText = document.getElementById("errorText");
+            var btnRetryFetch = document.getElementById("btnRetryFetch");
+            var btnCopyDirectLink = document.getElementById("btnCopyDirectLink");
+            var appLogoImg = document.getElementById("appLogoImg");
+            var defaultLogoSvg = document.getElementById("defaultLogoSvg");
+            var autoDownloadBanner = document.getElementById("autoDownloadBanner");
+            var autoCountdown = document.getElementById("autoCountdown");
+
+            var currentApkUrl = "";
+
+            function showToast(message, isError) {
+                var toast = document.getElementById("toast");
+                var icon = document.getElementById("toast-icon");
+                var msg = document.getElementById("toast-msg");
+
+                toast.classList.remove("translate-x-full", "opacity-0", "bg-emerald-600", "bg-red-600");
+                toast.classList.add(isError ? "bg-red-600" : "bg-emerald-600");
+                icon.textContent = isError ? "❌" : "✅";
+                msg.textContent = message;
+
+                setTimeout(function () {
+                    toast.classList.add("translate-x-full", "opacity-0");
+                }, 4000);
+            }
+
+            function getFieldString(fields, key) {
+                if (!fields || !fields[key]) return "";
+                return fields[key].stringValue || "";
+            }
+
+            function getFieldNumber(fields, key) {
+                if (!fields || !fields[key]) return 0;
+                if (fields[key].integerValue !== undefined) return Number(fields[key].integerValue);
+                if (fields[key].doubleValue !== undefined) return Number(fields[key].doubleValue);
+                return 0;
+            }
+
+            function formatPublishedDate(ms) {
+                if (!ms) return "Versão oficial verificada";
+                try {
+                    var dt = new Date(Number(ms));
+                    return "Atualizado em " + dt.toLocaleDateString("pt-BR");
+                } catch (e) {
+                    return "Versão oficial verificada";
+                }
+            }
+
+            function triggerDirectDownload(url) {
+                if (!url) return;
+                showToast("Download iniciado! Confira na pasta Downloads.", false);
+                // Redirecionamento direto funciona perfeitamente no Downloader da TV Box, Chrome e Safari
+                window.location.href = url;
+            }
+
+            function loadLatestRelease() {
+                errorBox.classList.add("hidden");
+                statusDot.className = "w-2 h-2 rounded-full bg-yellow-400 animate-pulse";
+                versionBadgeText.textContent = "Verificando versão mais recente...";
+                btnDownloadLabel.textContent = "Carregando link oficial...";
+                btnDownloadApk.classList.add("opacity-60", "pointer-events-none");
+
+                // Timestamp evita cache antigo no navegador da TV
+                var fetchUrl = FIRESTORE_URL + "?t=" + Date.now();
+
+                fetch(fetchUrl, { cache: "no-store" })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error("HTTP " + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        var fields = data && data.fields ? data.fields : null;
+                        var downloadUrl = getFieldString(fields, "downloadUrl").trim();
+                        var versionName = getFieldString(fields, "versionName").trim() || "Última Versão";
+                        var releaseNotes = getFieldString(fields, "releaseNotes").trim();
+                        var publishedAt = getFieldNumber(fields, "publishedAt");
+                        var logoUrl = getFieldString(fields, "appLogoUrl").trim();
+
+                        // Aplica logo personalizada caso tenha sido enviada no Painel Web
+                        if (logoUrl) {
+                            appLogoImg.src = logoUrl;
+                            appLogoImg.onload = function () {
+                                appLogoImg.classList.remove("hidden");
+                                defaultLogoSvg.classList.add("hidden");
+                            };
+                        }
+
+                        if (!downloadUrl) {
+                            throw new Error("Nenhum link de APK foi publicado no Painel Web ainda.");
+                        }
+
+                        currentApkUrl = downloadUrl;
+                        btnDownloadApk.href = downloadUrl;
+                        btnDownloadApk.classList.remove("opacity-60", "pointer-events-none");
+                        btnDownloadLabel.textContent = "Baixar Aura player (" + versionName + ")";
+
+                        statusDot.className = "w-2 h-2 rounded-full bg-emerald-400";
+                        versionBadgeText.textContent = "Versão " + versionName + " • Disponível";
+                        fileInfoBadge.textContent = "APK • v" + versionName;
+                        updatedDateText.textContent = formatPublishedDate(publishedAt);
+                        btnCopyDirectLink.classList.remove("hidden");
+
+                        // Foca automaticamente no botão para facilitar clique com Controle Remoto na TV
+                        try {
+                            btnDownloadApk.focus();
+                        } catch (e) {}
+
+                        if (releaseNotes) {
+                            releaseNotesText.textContent = releaseNotes;
+                            releaseNotesBox.classList.remove("hidden");
+                        }
+
+                        // Se a página for aberta com ?auto=1 (ideal para o app Downloader na TV), inicia sozinho
+                        if (window.location.search.indexOf("auto=1") !== -1) {
+                            autoDownloadBanner.classList.remove("hidden");
+                            var sec = 2;
+                            autoCountdown.textContent = sec;
+                            var timer = setInterval(function () {
+                                sec--;
+                                if (sec <= 0) {
+                                    clearInterval(timer);
+                                    autoDownloadBanner.textContent = "📥 Download iniciado! Se não começar, clique no botão abaixo.";
+                                    triggerDirectDownload(currentApkUrl);
+                                } else {
+                                    autoCountdown.textContent = sec;
+                                }
+                            }, 1000);
+                        }
+                    })
+                    .catch(function (err) {
+                        statusDot.className = "w-2 h-2 rounded-full bg-red-500";
+                        versionBadgeText.textContent = "Link indisponível no momento";
+                        btnDownloadLabel.textContent = "Tente novamente abaixo";
+                        errorText.textContent = err && err.message ? err.message : "Erro ao conectar ao servidor.";
+                        errorBox.classList.remove("hidden");
+                    });
+            }
+
+            btnDownloadApk.addEventListener("click", function () {
+                if (currentApkUrl) {
+                    showToast("Baixando APK para a pasta Downloads...", false);
+                }
+            });
+
+            btnCopyDirectLink.addEventListener("click", function () {
+                if (!currentApkUrl) return;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(currentApkUrl).then(function () {
+                        showToast("Link direto do APK copiado!", false);
+                    }).catch(function () {
+                        showToast("Não foi possível copiar automaticamente.", true);
+                    });
+                } else {
+                    showToast("Copie o link clicando e segurando no botão de download.", false);
+                }
+            });
+
+            btnRetryFetch.addEventListener("click", loadLatestRelease);
+
+            loadLatestRelease();
+        })();
+    </script>
+</body>
+</html>
