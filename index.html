@@ -111,9 +111,12 @@
                 </div>
             </div>
 
-            <!-- Aviso de Download Automático (quando aberto com ?auto=1) -->
-            <div id="autoDownloadBanner" class="hidden mt-6 p-3.5 rounded-2xl bg-cyan-950/60 border border-cyan-400/40 text-center text-xs sm:text-sm font-bold text-cyan-200">
-                ⏳ Iniciando o download automático em <span id="autoCountdown" class="text-white font-black">2</span>s...
+            <!-- Aviso de Download Automático (inicia sozinho direto para a pasta Downloads) -->
+            <div id="autoDownloadBanner" class="hidden mt-6 p-3.5 rounded-2xl bg-cyan-950/60 border border-cyan-400/40 flex flex-wrap items-center justify-center gap-3 text-xs sm:text-sm font-bold text-cyan-200">
+                <span id="autoDownloadStatusText">⏳ Iniciando o download automático em <span id="autoCountdown" class="text-white font-black">3</span>s...</span>
+                <button id="btnCancelAuto" type="button" class="tv-focusable px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-extrabold cursor-pointer">
+                    Cancelar
+                </button>
             </div>
 
             <!-- BOTÃO GIGANTE DE DOWNLOAD DIRETO -->
@@ -154,6 +157,17 @@
                     <span>✨ O que há de novo nesta versão</span>
                 </p>
                 <p id="releaseNotesText" class="text-xs sm:text-sm text-gray-300 whitespace-pre-line leading-relaxed"></p>
+            </div>
+
+            <!-- Código de 6 Dígitos do App Downloader (exibido se cadastrado no Painel Web) -->
+            <div id="downloaderCodeBox" class="hidden mt-4 bg-gradient-to-r from-purple-950/70 via-blue-950/70 to-cyan-950/70 border border-cyan-400/35 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="text-center sm:text-left">
+                    <p class="text-[11px] font-extrabold uppercase tracking-wider text-cyan-300">Código rápido para Android TV / TV Box</p>
+                    <p class="text-xs text-gray-300">Digite no aplicativo <strong>Downloader</strong> para baixar automático:</p>
+                </div>
+                <span id="downloaderCodeValue" class="px-5 py-2 rounded-xl bg-black/60 border border-cyan-400/50 font-mono text-2xl font-black tracking-[0.25em] text-cyan-300 shadow-lg">
+                    000000
+                </span>
             </div>
         </section>
 
@@ -220,9 +234,32 @@
             var appLogoImg = document.getElementById("appLogoImg");
             var defaultLogoSvg = document.getElementById("defaultLogoSvg");
             var autoDownloadBanner = document.getElementById("autoDownloadBanner");
+            var autoDownloadStatusText = document.getElementById("autoDownloadStatusText");
             var autoCountdown = document.getElementById("autoCountdown");
+            var btnCancelAuto = document.getElementById("btnCancelAuto");
+            var downloaderCodeBox = document.getElementById("downloaderCodeBox");
+            var downloaderCodeValue = document.getElementById("downloaderCodeValue");
 
             var currentApkUrl = "";
+            var autoTimer = null;
+            var autoCancelled = false;
+
+            function copyTextCompat(text) {
+                try {
+                    var tempInput = document.createElement("textarea");
+                    tempInput.value = text;
+                    tempInput.style.position = "fixed";
+                    tempInput.style.opacity = "0";
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    tempInput.setSelectionRange(0, 99999);
+                    var copied = document.execCommand("copy");
+                    document.body.removeChild(tempInput);
+                    return copied;
+                } catch (e) {
+                    return false;
+                }
+            }
 
             function showToast(message, isError) {
                 var toast = document.getElementById("toast");
@@ -264,8 +301,35 @@
             function triggerDirectDownload(url) {
                 if (!url) return;
                 showToast("Download iniciado! Confira na pasta Downloads.", false);
-                // Redirecionamento direto funciona perfeitamente no Downloader da TV Box, Chrome e Safari
+                // Redirecionamento direto dispara o download automático no Downloader da TV Box, Chrome e Safari
                 window.location.href = url;
+            }
+
+            function startAutoDownloadCountdown(seconds) {
+                if (autoCancelled || !currentApkUrl) return;
+                if (autoTimer) clearInterval(autoTimer);
+
+                autoDownloadBanner.classList.remove("hidden");
+                btnCancelAuto.classList.remove("hidden");
+
+                var sec = seconds;
+                autoCountdown.textContent = sec;
+
+                autoTimer = setInterval(function () {
+                    if (autoCancelled) {
+                        clearInterval(autoTimer);
+                        return;
+                    }
+                    sec--;
+                    if (sec <= 0) {
+                        clearInterval(autoTimer);
+                        btnCancelAuto.classList.add("hidden");
+                        autoDownloadStatusText.textContent = "📥 Download iniciado! Se não começar, clique no botão abaixo.";
+                        triggerDirectDownload(currentApkUrl);
+                    } else {
+                        autoCountdown.textContent = sec;
+                    }
+                }, 1000);
             }
 
             function loadLatestRelease() {
@@ -292,6 +356,7 @@
                         var releaseNotes = getFieldString(fields, "releaseNotes").trim();
                         var publishedAt = getFieldNumber(fields, "publishedAt");
                         var logoUrl = getFieldString(fields, "appLogoUrl").trim();
+                        var downloaderCode = getFieldString(fields, "downloaderCode").trim();
 
                         // Aplica logo personalizada caso tenha sido enviada no Painel Web
                         if (logoUrl) {
@@ -300,6 +365,12 @@
                                 appLogoImg.classList.remove("hidden");
                                 defaultLogoSvg.classList.add("hidden");
                             };
+                        }
+
+                        // Exibe código de 6 dígitos do App Downloader se cadastrado no Painel
+                        if (downloaderCode) {
+                            downloaderCodeValue.textContent = downloaderCode;
+                            downloaderCodeBox.classList.remove("hidden");
                         }
 
                         if (!downloadUrl) {
@@ -327,21 +398,17 @@
                             releaseNotesBox.classList.remove("hidden");
                         }
 
-                        // Se a página for aberta com ?auto=1 (ideal para o app Downloader na TV), inicia sozinho
-                        if (window.location.search.indexOf("auto=1") !== -1) {
-                            autoDownloadBanner.classList.remove("hidden");
-                            var sec = 2;
-                            autoCountdown.textContent = sec;
-                            var timer = setInterval(function () {
-                                sec--;
-                                if (sec <= 0) {
-                                    clearInterval(timer);
-                                    autoDownloadBanner.textContent = "📥 Download iniciado! Se não começar, clique no botão abaixo.";
-                                    triggerDirectDownload(currentApkUrl);
-                                } else {
-                                    autoCountdown.textContent = sec;
-                                }
-                            }, 1000);
+                        // Download automático inteligente:
+                        // - Se ?manual=1 estiver na URL, aguarda clique manual.
+                        // - Se ?auto=1 ou navegador do app Downloader/TV, inicia em 1 segundo.
+                        // - Em qualquer outro navegador, inicia automaticamente em 3 segundos (com opção de cancelar).
+                        var queryStr = window.location.search || "";
+                        var ua = navigator.userAgent || "";
+                        var isManualMode = queryStr.indexOf("manual=1") !== -1;
+                        var isFastAuto = queryStr.indexOf("auto=1") !== -1 || /Downloader|AFT/i.test(ua);
+
+                        if (!isManualMode) {
+                            startAutoDownloadCountdown(isFastAuto ? 1 : 3);
                         }
                     })
                     .catch(function (err) {
@@ -354,21 +421,25 @@
             }
 
             btnDownloadApk.addEventListener("click", function () {
+                if (autoTimer) clearInterval(autoTimer);
                 if (currentApkUrl) {
                     showToast("Baixando APK para a pasta Downloads...", false);
                 }
             });
 
+            btnCancelAuto.addEventListener("click", function () {
+                autoCancelled = true;
+                if (autoTimer) clearInterval(autoTimer);
+                autoDownloadBanner.classList.add("hidden");
+                showToast("Download automático cancelado. Clique no botão quando quiser baixar.", false);
+            });
+
             btnCopyDirectLink.addEventListener("click", function () {
                 if (!currentApkUrl) return;
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(currentApkUrl).then(function () {
-                        showToast("Link direto do APK copiado!", false);
-                    }).catch(function () {
-                        showToast("Não foi possível copiar automaticamente.", true);
-                    });
+                if (copyTextCompat(currentApkUrl)) {
+                    showToast("Link direto do APK copiado!", false);
                 } else {
-                    showToast("Copie o link clicando e segurando no botão de download.", false);
+                    showToast("Segure no botão de download para copiar o link.", true);
                 }
             });
 
